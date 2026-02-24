@@ -12,7 +12,7 @@
   "dependencies": {
     "@repo/ai-core": "workspace:*",
     "@repo/eval-core": "workspace:*",
-    "next": "15.1.6",
+    "next": "15.5.12",
     "react": "19.0.0",
     "react-dom": "19.0.0"
   },
