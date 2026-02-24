@@ -1,0 +1,122 @@
+[
+  {
+    "id": "t001",
+    "bucket": "high-conflict",
+    "post": "播客内容要不要做成短视频切片？",
+    "comments": ["必须做，不切片没人看。", "切片会破坏完整表达。", "可以切，但要保留上下文链接。"]
+  },
+  {
+    "id": "t002",
+    "bucket": "high-conflict",
+    "post": "产品迭代应该先追增长还是先做体验？",
+    "comments": ["没增长就没有未来。", "体验差增长也留不住。", "先做关键路径体验再放量。"]
+  },
+  {
+    "id": "t003",
+    "bucket": "high-conflict",
+    "post": "社区需要更严格的审核吗？",
+    "comments": ["必须严格，不然内容质量下降。", "过严会扼杀表达。", "分级治理更合理。"]
+  },
+  {
+    "id": "t004",
+    "bucket": "high-conflict",
+    "post": "AI 生成评论会不会让社区失真？",
+    "comments": ["会，情感温度会下降。", "不会，关键看使用方式。", "建议标记 AI 辅助内容。"]
+  },
+  {
+    "id": "t005",
+    "bucket": "high-conflict",
+    "post": "长文还有必要吗？",
+    "comments": ["短内容才是趋势。", "长文有深度价值。", "两者并存，场景不同。"]
+  },
+  {
+    "id": "t006",
+    "bucket": "low-information",
+    "post": "今天更新了新版本。",
+    "comments": ["不错", "支持", "加油"]
+  },
+  {
+    "id": "t007",
+    "bucket": "low-information",
+    "post": "这个功能大家觉得如何？",
+    "comments": ["还行", "一般", "可以再改改"]
+  },
+  {
+    "id": "t008",
+    "bucket": "low-information",
+    "post": "刚开始用这个 App",
+    "comments": ["欢迎", "同感", "冲"]
+  },
+  {
+    "id": "t009",
+    "bucket": "low-information",
+    "post": "最近状态低迷怎么办？",
+    "comments": ["多休息", "加油", "会好的"]
+  },
+  {
+    "id": "t010",
+    "bucket": "low-information",
+    "post": "这期节目你们听了吗",
+    "comments": ["听了", "不错", "可以"]
+  },
+  {
+    "id": "t011",
+    "bucket": "polarized",
+    "post": "远程办公效率更高吗？",
+    "comments": ["远程效率更高。", "办公室才有协作氛围。", "看岗位性质。"]
+  },
+  {
+    "id": "t012",
+    "bucket": "polarized",
+    "post": "AI 会替代初级岗位吗？",
+    "comments": ["会替代大量重复工作。", "不会，沟通和判断仍需要人。", "岗位会重构而不是消失。"]
+  },
+  {
+    "id": "t013",
+    "bucket": "polarized",
+    "post": "学习编程还值得吗？",
+    "comments": ["当然值得。", "AI 时代没必要。", "基础能力永远有价值。"]
+  },
+  {
+    "id": "t014",
+    "bucket": "polarized",
+    "post": "产品经理要不要懂代码？",
+    "comments": ["必须懂，不然无法判断方案。", "不用，懂业务就够了。", "至少要有技术理解力。"]
+  },
+  {
+    "id": "t015",
+    "bucket": "polarized",
+    "post": "内容平台该不该推荐算法优先？",
+    "comments": ["推荐能提升效率。", "会造成信息茧房。", "需要算法与订阅并存。"]
+  },
+  {
+    "id": "t016",
+    "bucket": "high-conflict",
+    "post": "社区里 should ban AI-generated art 吗？",
+    "comments": ["应该禁止，侵权风险高。", "不该禁止，创作自由。", "先要求标注来源。"]
+  },
+  {
+    "id": "t017",
+    "bucket": "low-information",
+    "post": "有人一起做项目吗",
+    "comments": ["1", "+1", "带我"]
+  },
+  {
+    "id": "t018",
+    "bucket": "polarized",
+    "post": "播客节目是否应该缩短到20分钟内？",
+    "comments": ["短一点更友好。", "深度内容需要时长。", "可以做短版+完整版。"]
+  },
+  {
+    "id": "t019",
+    "bucket": "high-conflict",
+    "post": "社区是否该引入会员分层？",
+    "comments": ["分层能提升体验。", "会制造隔阂。", "可先做轻度权益测试。"]
+  },
+  {
+    "id": "t020",
+    "bucket": "polarized",
+    "post": "做产品要数据驱动还是直觉驱动？",
+    "comments": ["数据优先。", "直觉也很关键。", "先假设再用数据验证。"]
+  }
+]

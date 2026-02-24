@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Run {
+  id           String   @id @default(cuid())
+  project      String
+  inputHash    String
+  model        String
+  promptVer    String
+  latencyMs    Int?
+  costUsd      Float?
+  status       String
+  createdAt    DateTime @default(now())
+  scores       Score[]
+  errors       ErrorLog[]
+}
+
+model Score {
+  id        String   @id @default(cuid())
+  runId     String
+  dimension String
+  score     Int
+  evaluator String
+  note      String?
+  createdAt DateTime @default(now())
+  run       Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+}
+
+model ErrorLog {
+  id        String   @id @default(cuid())
+  runId     String
+  code      String
+  message   String
+  retried   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  run       Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+}

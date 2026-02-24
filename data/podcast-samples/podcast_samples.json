@@ -1,0 +1,22 @@
+[
+  {"id":"p001","bucket":"short-clean","title":"效率与专注","transcript":"今天我们讨论如何在碎片时间里保持专注，关键是先明确最小任务。"},
+  {"id":"p002","bucket":"short-clean","title":"创作者心态","transcript":"创作焦虑往往来自比较，真正有效的是稳定发布节奏和反馈循环。"},
+  {"id":"p003","bucket":"short-clean","title":"内容复盘","transcript":"每次发布后做十分钟复盘，比盲目加班更能提升质量。"},
+  {"id":"p004","bucket":"short-clean","title":"播客选题","transcript":"选题不是追热点，而是找到长期可持续讲述的问题域。"},
+  {"id":"p005","bucket":"short-clean","title":"采访技巧","transcript":"好的采访不是问更多问题，而是问到关键转折点。"},
+  {"id":"p006","bucket":"long-clean","title":"知识管理","transcript":"知识管理的核心不是收藏，而是复用。你需要把输入转化为可执行卡片，并在项目中调用。"},
+  {"id":"p007","bucket":"long-clean","title":"产品迭代","transcript":"产品迭代要避免功能堆叠，先把一个高频场景打透，再扩展到相邻场景。"},
+  {"id":"p008","bucket":"long-clean","title":"团队协作","transcript":"跨团队协作的关键是统一目标和术语，不然每次讨论都在重新定义问题。"},
+  {"id":"p009","bucket":"long-clean","title":"用户研究","transcript":"访谈时最有价值的是用户真实行为，而不是他们自我描述的理想行为。"},
+  {"id":"p010","bucket":"long-clean","title":"内容分发","transcript":"分发效率的提升常常来自标题与首屏信息，而不是增加渠道数量。"},
+  {"id":"p011","bucket":"long-clean","title":"时间管理","transcript":"高产不是做更多，而是减少上下文切换，给深度工作留出连续时间块。"},
+  {"id":"p012","bucket":"long-clean","title":"学习策略","transcript":"学习新技术时，先搭最小闭环再补理论，比从头看完教程更快形成掌握感。"},
+  {"id":"p013","bucket":"noisy","title":"地铁录音","transcript":"嗯今天我们聊一下那个，呃怎么说，效率这个事儿其实不是说拼命做就行，关键是先把事情排一排。"},
+  {"id":"p014","bucket":"noisy","title":"咖啡馆背景音","transcript":"背景有点吵但我想说，创作者最容易卡住的是开头，先写一个很差的版本再改。"},
+  {"id":"p015","bucket":"noisy","title":"远程连线","transcript":"喂喂听得到吗，嗯刚才断了一下，我们继续，产品验证要先定义成功指标，不然无法判断进展。"},
+  {"id":"p016","bucket":"noisy","title":"户外采访","transcript":"风有点大啊，但这个问题很关键，用户不是不愿意用新功能，而是不理解价值。"},
+  {"id":"p017","bucket":"noisy","title":"现场活动","transcript":"现场比较嘈杂，我们抓重点，团队需要一个统一的复盘模板来沉淀结论。"},
+  {"id":"p018","bucket":"noisy","title":"电话录音","transcript":"信号有点差，我重复一下，做 AI 打样要先把边界讲清楚，避免输出超范围。"},
+  {"id":"p019","bucket":"short-clean","title":"表达训练","transcript":"表达能力提升最快的方法是把复杂问题讲成三句话。"},
+  {"id":"p020","bucket":"long-clean","title":"职业转型","transcript":"技术转产品不是放弃技术，而是把技术能力用于更高层次的问题定义和验证。"}
+]

@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-02-20 18:12:55",
+  "podcastBase": "http://127.0.0.1:3001",
+  "communityBase": "http://127.0.0.1:3002",
+  "podcast": {
+    "sampleCount": 20,
+    "avgHighlightScore": 78,
+    "avgQuality": 85,
+    "avgSpeed": 77,
+    "avgCost": 80,
+    "avgStability": 100
+  },
+  "community": {
+    "sampleCount": 20,
+    "avgCompression": 100,
+    "avgFaithfulness": 88,
+    "avgSafety": 85,
+    "avgUsability": 94
+  },
+  "note": "Current metrics are based on fallback logic + heuristic evaluate endpoints."
+}

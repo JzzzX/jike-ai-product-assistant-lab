@@ -1,0 +1,22 @@
+{
+  "name": "jike-ai-product-assistant-lab",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.12.3",
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write .",
+    "eval:samples": "node scripts/run_sample_eval.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "eslint": "^9.20.1",
+    "prettier": "^3.5.0",
+    "turbo": "^2.4.2",
+    "typescript": "^5.7.3"
+  }
+}
