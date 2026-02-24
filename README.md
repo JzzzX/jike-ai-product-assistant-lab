@@ -22,7 +22,12 @@ pnpm dev
 ## 核心文档
 
 - 计划总览: `ai_product_assistant_plan.md`
+- 最新交接: `docs/execution/SESSION_HANDOFF_2026-02-24.md`
 - 阶段门禁: `docs/execution/stage-gates.md`
 - 风险清单: `docs/execution/risk-register.md`
 - 面试题库: `docs/execution/interview-bank.md`
 - 部署指南: `docs/deployment/github-pages-vercel.md`
+
+## 历史归档
+
+- 旧阶段推进记录与临时计划: `docs/archive/2026-02-20-planning/`
