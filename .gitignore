@@ -7,4 +7,5 @@ out
 coverage
 dist
 *.log
+*.tsbuildinfo
 .DS_Store
