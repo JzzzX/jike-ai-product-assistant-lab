@@ -31,10 +31,10 @@ async function readEvalReport(): Promise<EvalReport | null> {
 }
 
 function scoreLabel(score: number): string {
-  if (score >= 90) return "Excellent";
-  if (score >= 80) return "Strong";
-  if (score >= 70) return "Usable";
-  return "Needs Iteration";
+  if (score >= 90) return "优秀";
+  if (score >= 80) return "稳定";
+  if (score >= 70) return "可用";
+  return "待优化";
 }
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -43,50 +43,40 @@ const podcastDemoUrl = process.env.NEXT_PUBLIC_PODCAST_DEMO_URL || (basePath ? "
 const communityDemoUrl = process.env.NEXT_PUBLIC_COMMUNITY_DEMO_URL || (basePath ? "#" : "http://localhost:3002");
 const docsPath = `${basePath}/docs`;
 
-const quickSteps = [
-  {
-    title: "Open a Demo",
-    desc: "Choose Podcast or Community demo based on the workflow you want to verify."
-  },
-  {
-    title: "Run Full Flow",
-    desc: "Click one button to execute the full pipeline and inspect structured output."
-  },
-  {
-    title: "Check Evidence",
-    desc: "Review scores, smoke checks, and persisted run files for traceability."
-  }
+const hrSteps = [
+  "打开任一 Demo，点击“一键跑完整流程”",
+  "查看流程输出与评估分数",
+  "查看 run 存档与批量评估报告"
 ] as const;
 
-const docLinks = [
-  { title: "Project Overview", path: "docs/overview.md" },
-  { title: "Architecture", path: "docs/architecture.md" },
-  { title: "Evaluation", path: "docs/evaluation.md" },
-  { title: "Releases", path: "docs/releases.md" },
-  { title: "Showcase One-Pager", path: "SHOWCASE.md" }
+const coreDocs = [
+  { title: "项目概览", path: "docs/overview.md" },
+  { title: "技术架构", path: "docs/architecture.md" },
+  { title: "评估方法", path: "docs/evaluation.md" },
+  { title: "版本发布", path: "docs/releases.md" },
+  { title: "一页展示", path: "SHOWCASE.md" }
 ] as const;
 
-const podcastKeyFiles = [
+const podcastFiles = [
   "apps/podcast-highlighter/src/app/page.tsx",
   "apps/podcast-highlighter/src/app/api/transcribe/route.ts",
   "apps/podcast-highlighter/src/app/api/highlights/route.ts",
   "apps/podcast-highlighter/src/app/api/evaluate/route.ts"
 ] as const;
 
-const communityKeyFiles = [
+const communityFiles = [
   "apps/community-curator/src/app/page.tsx",
   "apps/community-curator/src/app/api/summarize-thread/route.ts",
   "apps/community-curator/src/app/api/cluster-opinions/route.ts",
   "apps/community-curator/src/app/api/evaluate/route.ts"
 ] as const;
 
-function RepoLink({ filePath }: { filePath: string }) {
+function FileLink({ filePath }: { filePath: string }) {
   if (!repoUrl) {
-    return <span className="file-item">{filePath}</span>;
+    return <span className="file-link">{filePath}</span>;
   }
-
   return (
-    <a className="file-item" href={`${repoUrl}/blob/main/${filePath}`} target="_blank" rel="noreferrer">
+    <a className="file-link" href={`${repoUrl}/blob/main/${filePath}`} target="_blank" rel="noreferrer">
       {filePath}
     </a>
   );
@@ -94,11 +84,9 @@ function RepoLink({ filePath }: { filePath: string }) {
 
 export default async function Page() {
   const report = await readEvalReport();
-
   const podcastComposite = report
     ? Math.round((report.podcast.avgQuality + report.podcast.avgSpeed + report.podcast.avgCost + report.podcast.avgStability) / 4)
     : null;
-
   const communityComposite = report
     ? Math.round(
         (report.community.avgCompression + report.community.avgFaithfulness + report.community.avgSafety + report.community.avgUsability) / 4
@@ -106,210 +94,125 @@ export default async function Page() {
     : null;
 
   return (
-    <main className="showcase-shell">
-      <header className="site-nav reveal">
-        <p className="site-name">AI Product Prototyping Portfolio</p>
+    <main className="minimal-shell">
+      <header className="top">
+        <p>AI Product Prototyping Portfolio</p>
         <nav>
-          <a href="#projects">Projects</a>
-          <a href="#metrics">Metrics</a>
-          <a href="#docs">Docs</a>
+          <a href="#projects">项目</a>
+          <a href="#metrics">指标</a>
+          <a href="#docs">文档</a>
         </nav>
       </header>
 
-      <section className="hero reveal delay-1">
-        <div className="hero-main">
-          <p className="hero-kicker">Built for hiring review</p>
-          <h1>Two AI product demos, one verifiable delivery standard.</h1>
-          <p>
-            This repository focuses on practical product execution: problem framing, fast prototyping, measurable evaluation, and
-            release discipline.
-          </p>
-          <div className="hero-actions">
-            <a className="btn primary" href={podcastDemoUrl} target="_blank" rel="noreferrer">
-              Open Podcast Demo
-            </a>
-            <a className="btn secondary" href={communityDemoUrl} target="_blank" rel="noreferrer">
-              Open Community Demo
-            </a>
-            <a className="btn plain" href={docsPath}>
-              Read Core Docs
-            </a>
-          </div>
+      <section className="hero">
+        <h1>AI 产品助理作品集（面向招聘展示）</h1>
+        <p className="subtitle">两个可运行、可评估、可回归的 Demo：播客场景与社区场景。</p>
+
+        <div className="actions">
+          <a className="btn primary" href={podcastDemoUrl} target="_blank" rel="noreferrer">
+            打开播客 Demo
+          </a>
+          <a className="btn" href={communityDemoUrl} target="_blank" rel="noreferrer">
+            打开社区 Demo
+          </a>
+          <a className="btn" href={docsPath}>
+            查看核心文档
+          </a>
         </div>
 
-        <aside className="hero-meta">
-          <article>
-            <p>Current release</p>
-            <strong>v1.0</strong>
-          </article>
-          <article>
-            <p>Podcast score</p>
-            <strong>{podcastComposite ?? "--"}</strong>
-            <span>{podcastComposite ? scoreLabel(podcastComposite) : "No report yet"}</span>
-          </article>
-          <article>
-            <p>Community score</p>
-            <strong>{communityComposite ?? "--"}</strong>
-            <span>{communityComposite ? scoreLabel(communityComposite) : "No report yet"}</span>
-          </article>
-          <article>
-            <p>Last report</p>
-            <strong>{report?.generatedAt || "Not generated"}</strong>
-          </article>
-        </aside>
+        <div className="meta-line">
+          <span>版本：v1.0</span>
+          <span>播客综合分：{podcastComposite ?? "--"}</span>
+          <span>社区综合分：{communityComposite ?? "--"}</span>
+          <span>报告时间：{report?.generatedAt || "未生成"}</span>
+        </div>
       </section>
 
-      <section className="quickstart reveal delay-2">
-        <h2>How to use this portfolio in 3 minutes</h2>
-        <div className="step-grid">
-          {quickSteps.map((item, index) => (
-            <article key={item.title} className="step-card">
-              <span>0{index + 1}</span>
-              <h3>{item.title}</h3>
-              <p>{item.desc}</p>
-            </article>
+      <section className="block" id="guide">
+        <h2>HR 快速查看（3 分钟）</h2>
+        <ol className="simple-list">
+          {hrSteps.map((step) => (
+            <li key={step}>{step}</li>
           ))}
-        </div>
+        </ol>
       </section>
 
-      <section id="projects" className="projects reveal delay-3">
-        <div className="section-head">
-          <h2>Project Matrix</h2>
-          <p>Each demo has an end-to-end user flow, explicit API boundaries, and evaluation output.</p>
-        </div>
-
+      <section className="block" id="projects">
+        <h2>项目矩阵</h2>
         <div className="project-grid">
-          <article className="project-card podcast">
-            <header>
-              <h3>Podcast Highlighter</h3>
-              <span>Audio</span>
-            </header>
-            <p>Convert long-form audio content into shareable highlights with timestamps and rationale.</p>
+          <article>
+            <h3>播客 AI 高光助手</h3>
+            <p>长音频信息提炼：转写 → 高光 → 分享 → 评估</p>
             <ul>
-              <li>Flow: Transcribe → Highlight → Share Card → Evaluate</li>
-              <li>Supports text input and audio upload</li>
-              <li>Includes run persistence in `evaluation/runs`</li>
+              <li>支持文本与音频输入</li>
+              <li>高光时间戳与分段对齐</li>
+              <li>评估结果落盘到 `evaluation/runs`</li>
             </ul>
-            <div className="project-actions">
-              <a href={podcastDemoUrl} target="_blank" rel="noreferrer">
-                Try Demo
-              </a>
-              <a href={docsPath}>See Metrics</a>
-            </div>
-            <div className="file-list">
-              {podcastKeyFiles.map((filePath) => (
-                <RepoLink key={filePath} filePath={filePath} />
+            <div className="file-grid">
+              {podcastFiles.map((filePath) => (
+                <FileLink key={filePath} filePath={filePath} />
               ))}
             </div>
           </article>
 
-          <article className="project-card community">
-            <header>
-              <h3>Community Curator</h3>
-              <span>Discussion</span>
-            </header>
-            <p>Turn noisy threads into structured summaries, opinion clusters, and safe response drafts.</p>
+          <article>
+            <h3>社区内容 AI 整理员</h3>
+            <p>长讨论串提效：总结 → 聚类 → 草稿 → 评估</p>
             <ul>
-              <li>Flow: Summarize → Cluster → Draft Reply → Evaluate</li>
-              <li>Supports cluster count control and evidence mapping</li>
-              <li>Includes run persistence in `evaluation/runs`</li>
+              <li>支持聚类数和约束可配置</li>
+              <li>输出证据映射和风险提示</li>
+              <li>评估结果落盘到 `evaluation/runs`</li>
             </ul>
-            <div className="project-actions">
-              <a href={communityDemoUrl} target="_blank" rel="noreferrer">
-                Try Demo
-              </a>
-              <a href={docsPath}>See Metrics</a>
-            </div>
-            <div className="file-list">
-              {communityKeyFiles.map((filePath) => (
-                <RepoLink key={filePath} filePath={filePath} />
+            <div className="file-grid">
+              {communityFiles.map((filePath) => (
+                <FileLink key={filePath} filePath={filePath} />
               ))}
             </div>
           </article>
         </div>
       </section>
 
-      <section id="metrics" className="metrics reveal delay-4">
-        <div className="section-head">
-          <h2>Evidence Snapshot</h2>
-          <p>Numbers come from `reports/sample_eval_report.json` and can be regenerated by command.</p>
-        </div>
-
+      <section className="block" id="metrics">
+        <h2>指标快照</h2>
         {report ? (
           <div className="metric-grid">
-            <article className="metric-card">
-              <h3>Podcast</h3>
-              <dl>
-                <div>
-                  <dt>Sample Count</dt>
-                  <dd>{report.podcast.sampleCount}</dd>
-                </div>
-                <div>
-                  <dt>Quality</dt>
-                  <dd>{report.podcast.avgQuality}</dd>
-                </div>
-                <div>
-                  <dt>Speed</dt>
-                  <dd>{report.podcast.avgSpeed}</dd>
-                </div>
-                <div>
-                  <dt>Cost</dt>
-                  <dd>{report.podcast.avgCost}</dd>
-                </div>
-                <div>
-                  <dt>Stability</dt>
-                  <dd>{report.podcast.avgStability}</dd>
-                </div>
-              </dl>
+            <article>
+              <h3>播客项目</h3>
+              <p>样本数：{report.podcast.sampleCount}</p>
+              <p>质量：{report.podcast.avgQuality}</p>
+              <p>速度：{report.podcast.avgSpeed}</p>
+              <p>成本：{report.podcast.avgCost}</p>
+              <p>稳定性：{report.podcast.avgStability}</p>
+              <p>评价：{scoreLabel(podcastComposite || 0)}</p>
             </article>
-
-            <article className="metric-card">
-              <h3>Community</h3>
-              <dl>
-                <div>
-                  <dt>Sample Count</dt>
-                  <dd>{report.community.sampleCount}</dd>
-                </div>
-                <div>
-                  <dt>Compression</dt>
-                  <dd>{report.community.avgCompression}</dd>
-                </div>
-                <div>
-                  <dt>Faithfulness</dt>
-                  <dd>{report.community.avgFaithfulness}</dd>
-                </div>
-                <div>
-                  <dt>Safety</dt>
-                  <dd>{report.community.avgSafety}</dd>
-                </div>
-                <div>
-                  <dt>Usability</dt>
-                  <dd>{report.community.avgUsability}</dd>
-                </div>
-              </dl>
+            <article>
+              <h3>社区项目</h3>
+              <p>样本数：{report.community.sampleCount}</p>
+              <p>压缩：{report.community.avgCompression}</p>
+              <p>忠实度：{report.community.avgFaithfulness}</p>
+              <p>安全：{report.community.avgSafety}</p>
+              <p>可用性：{report.community.avgUsability}</p>
+              <p>评价：{scoreLabel(communityComposite || 0)}</p>
             </article>
           </div>
         ) : (
-          <p className="empty-tip">Run `pnpm eval:samples` after starting demo servers to generate the report.</p>
+          <p className="hint">未检测到评估报告。请先运行 `pnpm eval:samples`。</p>
         )}
       </section>
 
-      <section id="docs" className="docs reveal delay-5">
-        <div className="section-head">
-          <h2>Core Documents</h2>
-          <p>Only the documents needed for external review are listed here.</p>
-        </div>
-        <div className="doc-grid">
-          {docLinks.map((item) => (
-            <article key={item.path} className="doc-card">
+      <section className="block" id="docs">
+        <h2>核心文档</h2>
+        <div className="doc-list">
+          {coreDocs.map((item) => (
+            <article key={item.path}>
               <h3>{item.title}</h3>
               <code>{item.path}</code>
               {repoUrl ? (
                 <a href={`${repoUrl}/blob/main/${item.path}`} target="_blank" rel="noreferrer">
-                  Open in GitHub
+                  在 GitHub 打开
                 </a>
               ) : (
-                <span className="muted">Set NEXT_PUBLIC_GITHUB_REPO_URL to enable GitHub links</span>
+                <span className="hint">配置 NEXT_PUBLIC_GITHUB_REPO_URL 后可直达</span>
               )}
             </article>
           ))}
