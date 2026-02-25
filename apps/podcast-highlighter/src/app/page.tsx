@@ -55,6 +55,8 @@ export default function Page() {
   const [shareCard, setShareCard] = useState<ShareCardRes | null>(null);
   const [evaluation, setEvaluation] = useState<EvaluateRes | null>(null);
   const [highlightSource, setHighlightSource] = useState<"fallback" | "model" | null>(null);
+  const highlightSourceLabel =
+    highlightSource === "model" ? "模型" : highlightSource === "fallback" ? "回退" : "尚未请求";
 
   const transcriptText = useMemo(
     () => transcriptInput.trim() || transcriptRes?.transcript || "",
@@ -117,7 +119,7 @@ export default function Page() {
       setHighlightSource(null);
     } catch (error) {
       setErrorCount((current) => current + 1);
-      setRequestError(error instanceof Error ? error.message : "transcribe failed");
+      setRequestError(error instanceof Error ? error.message : "文本转写失败");
     } finally {
       setLoadingAction("");
     }
@@ -151,7 +153,7 @@ export default function Page() {
       setHighlightSource(null);
     } catch (error) {
       setErrorCount((current) => current + 1);
-      setRequestError(error instanceof Error ? error.message : "audio transcribe failed");
+      setRequestError(error instanceof Error ? error.message : "音频转写失败");
     } finally {
       setLoadingAction("");
     }
@@ -223,7 +225,7 @@ export default function Page() {
     } catch (error) {
       nextErrorCount += 1;
       setErrorCount(nextErrorCount);
-      setRequestError(error instanceof Error ? error.message : "run full flow failed");
+      setRequestError(error instanceof Error ? error.message : "完整流程执行失败");
     } finally {
       setLoadingAction("");
     }
@@ -251,7 +253,7 @@ export default function Page() {
       setHighlightLatencyMs(Math.round(performance.now() - started));
     } catch (error) {
       setErrorCount((current) => current + 1);
-      setRequestError(error instanceof Error ? error.message : "highlight failed");
+      setRequestError(error instanceof Error ? error.message : "高光提取失败");
     } finally {
       setLoadingAction("");
     }
@@ -273,7 +275,7 @@ export default function Page() {
       setShareLatencyMs(Math.round(performance.now() - started));
     } catch (error) {
       setErrorCount((current) => current + 1);
-      setRequestError(error instanceof Error ? error.message : "share card failed");
+      setRequestError(error instanceof Error ? error.message : "分享卡片生成失败");
     } finally {
       setLoadingAction("");
     }
@@ -293,7 +295,7 @@ export default function Page() {
       setEvaluation(data);
     } catch (error) {
       setErrorCount((current) => current + 1);
-      setRequestError(error instanceof Error ? error.message : "evaluation failed");
+      setRequestError(error instanceof Error ? error.message : "评估生成失败");
     } finally {
       setLoadingAction("");
     }
@@ -303,9 +305,9 @@ export default function Page() {
     <main className="demo-shell">
       <section className="hero reveal">
         <div>
-          <p className="eyebrow">Podcast Demo</p>
+          <p className="eyebrow">播客 Demo</p>
           <h1>播客 AI 高光助手</h1>
-          <p className="hero-sub">验证闭环：转写 → 高光提取 → 分享草稿 → 评估。可选带 token 调真实模型。</p>
+          <p className="hero-sub">验证闭环：转写 → 高光提取 → 分享草稿 → 评估。可选携带访问令牌调用真实模型。</p>
           <div className="hero-tags">
             <span>结构化高光</span>
             <span>可解释理由</span>
@@ -314,14 +316,14 @@ export default function Page() {
           </div>
         </div>
         <div className="hero-side">
-          <label htmlFor="demo-token">Demo Token (可选)</label>
+          <label htmlFor="demo-token">访问令牌（可选）</label>
           <input
             id="demo-token"
             value={demoToken}
             onChange={(e) => setDemoToken(e.target.value)}
             placeholder="用于线上受控访问真实模型"
           />
-          <p>当前高光来源：{highlightSource || "尚未请求"}</p>
+          <p>当前高光来源：{highlightSourceLabel}</p>
           <p>累计延迟：{totalLatencyMs} ms</p>
           <p>累计错误：{errorCount}</p>
           <button className="secondary" onClick={runFullFlow} disabled={loadingAction !== ""}>
@@ -417,7 +419,7 @@ export default function Page() {
                   <li key={draft}>{draft}</li>
                 ))}
               </ul>
-              <p className="meta">source: {shareCard.source || "unknown"}</p>
+              <p className="meta">结果来源：{shareCard.source || "未知"}</p>
             </div>
           ) : (
             <pre>{JSON.stringify(shareCard, null, 2)}</pre>
@@ -432,7 +434,7 @@ export default function Page() {
           </button>
           <p className="meta">
             入参指标：latencyMs={totalLatencyMs} / errorCount={errorCount} / hasHighlights=
-            {highlights.length > 0 ? "true" : "false"} / highlightCount={highlights.length}
+            {highlights.length > 0 ? "是" : "否"} / highlightCount={highlights.length}
           </p>
           <p className="meta">评估存档：{evaluation?.savedRunPath || "未生成"}</p>
           <pre>{JSON.stringify(evaluation, null, 2)}</pre>

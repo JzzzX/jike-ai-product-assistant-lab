@@ -34,7 +34,7 @@ export default function DocsPage() {
   return (
     <main className="minimal-shell docs-page">
       <header className="top">
-        <p>Core Documents</p>
+        <p>核心文档</p>
         <a href={homePath}>返回首页</a>
       </header>
 

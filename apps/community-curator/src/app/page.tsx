@@ -97,6 +97,8 @@ export default function Page() {
         .filter(Boolean),
     [constraintsText]
   );
+  const summarySourceLabel =
+    summary?.source === "model" ? "模型" : summary?.source === "fallback" ? "回退" : "尚未请求";
 
   async function postJson<T>(url: string, payload: unknown): Promise<T> {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -124,7 +126,7 @@ export default function Page() {
       const data = await postJson<SummaryRes>("/api/summarize-thread", { post, comments, mode: summaryMode });
       setSummary(data);
     } catch (error) {
-      setRequestError(error instanceof Error ? error.message : "summary failed");
+      setRequestError(error instanceof Error ? error.message : "总结生成失败");
     } finally {
       setLoadingAction("");
     }
@@ -141,7 +143,7 @@ export default function Page() {
         setTargetCluster((prev) => (clusters.some((item) => item.label === prev) ? prev : clusters[0].label));
       }
     } catch (error) {
-      setRequestError(error instanceof Error ? error.message : "cluster failed");
+      setRequestError(error instanceof Error ? error.message : "聚类生成失败");
     } finally {
       setLoadingAction("");
     }
@@ -166,7 +168,7 @@ export default function Page() {
       });
       setDrafts(data);
     } catch (error) {
-      setRequestError(error instanceof Error ? error.message : "draft failed");
+      setRequestError(error instanceof Error ? error.message : "草稿生成失败");
     } finally {
       setLoadingAction("");
     }
@@ -223,7 +225,7 @@ export default function Page() {
       });
       setEvaluation(evaluationData);
     } catch (error) {
-      setRequestError(error instanceof Error ? error.message : "run full flow failed");
+      setRequestError(error instanceof Error ? error.message : "完整流程执行失败");
     } finally {
       setLoadingAction("");
     }
@@ -251,7 +253,7 @@ export default function Page() {
       });
       setEvaluation(data);
     } catch (error) {
-      setRequestError(error instanceof Error ? error.message : "evaluation failed");
+      setRequestError(error instanceof Error ? error.message : "评估生成失败");
     } finally {
       setLoadingAction("");
     }
@@ -261,7 +263,7 @@ export default function Page() {
     <main className="demo-shell">
       <section className="hero reveal">
         <div>
-          <p className="eyebrow">Community Demo</p>
+          <p className="eyebrow">社区 Demo</p>
           <h1>社区内容 AI 整理员</h1>
           <p className="hero-sub">验证闭环：帖子输入 → 总结 → 聚类 → 评论草稿 → 评估。支持受控模型调用。</p>
           <div className="hero-tags">
@@ -272,7 +274,7 @@ export default function Page() {
           </div>
         </div>
         <div className="hero-side">
-          <label htmlFor="demo-token">Demo Token (可选)</label>
+          <label htmlFor="demo-token">访问令牌（可选）</label>
           <input
             id="demo-token"
             value={demoToken}
@@ -280,7 +282,7 @@ export default function Page() {
             placeholder="用于线上受控访问真实模型"
           />
           <p>评论数量：{comments.length}</p>
-          <p>总结来源：{summary?.source || "尚未请求"}</p>
+          <p>总结来源：{summarySourceLabel}</p>
           <button className="secondary" onClick={runFullFlow} disabled={loadingAction !== ""}>
             {loadingAction ? "执行中..." : "一键跑完整流程"}
           </button>
@@ -296,8 +298,8 @@ export default function Page() {
           <textarea rows={8} value={commentsText} onChange={(e) => setCommentsText(e.target.value)} style={{ marginTop: 10 }} />
           <label htmlFor="summary-mode">总结模式</label>
           <select id="summary-mode" value={summaryMode} onChange={(e) => setSummaryMode(e.target.value as SummaryMode)}>
-            <option value="short">short</option>
-            <option value="long">long</option>
+            <option value="short">短总结</option>
+            <option value="long">长总结</option>
           </select>
           <button onClick={summarizeThread} disabled={loadingAction !== ""}>
             {loadingAction === "summary" ? "处理中..." : "生成总结"}
@@ -312,7 +314,7 @@ export default function Page() {
                   <li key={point}>{point}</li>
                 ))}
               </ul>
-              <p className="meta">source: {summary.source || "unknown"}</p>
+              <p className="meta">结果来源：{summary.source || "未知"}</p>
             </div>
           ) : (
             <pre>{JSON.stringify(summary, null, 2)}</pre>
@@ -362,7 +364,7 @@ export default function Page() {
 
               {(cluster.disagreements || []).map((item) => (
                 <p key={item.topic} className="meta">
-                  分歧: {item.topic} | 立场: {item.sides.join(" vs ")} | 证据: {item.evidenceIds.join(", ")}
+                  分歧: {item.topic} | 立场: {item.sides.join(" / ")} | 证据: {item.evidenceIds.join(", ")}
                 </p>
               ))}
             </>
@@ -394,7 +396,7 @@ export default function Page() {
                   </li>
                 ))}
               </ul>
-              <p className="meta">constraintsApplied: {(drafts.constraintsApplied || []).join("、") || "无"}</p>
+              <p className="meta">已应用约束：{(drafts.constraintsApplied || []).join("、") || "无"}</p>
               <p className="risk">总体风险提示：{drafts.riskHint || drafts.drafts[0]?.riskHint || "无"}</p>
             </>
           ) : (

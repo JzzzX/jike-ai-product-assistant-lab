@@ -96,7 +96,7 @@ export default async function Page() {
   return (
     <main className="minimal-shell">
       <header className="top">
-        <p>AI Product Prototyping Portfolio</p>
+        <p>AI 产品打样作品集</p>
         <nav>
           <a href="#projects">项目</a>
           <a href="#metrics">指标</a>
