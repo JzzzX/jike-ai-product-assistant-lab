@@ -23,7 +23,4 @@
 - `POST /api/evaluate`
 
 ## 文档
-- `docs/prd-lite.md`
-- `docs/experiment-log.md`
-- `docs/decision-log.md`
 - `evaluation/rubric.md`

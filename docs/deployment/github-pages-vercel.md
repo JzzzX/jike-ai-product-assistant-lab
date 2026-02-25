@@ -13,8 +13,8 @@
 1. 仓库切到 `public`
 2. Settings -> Pages -> Source 选择 `GitHub Actions`
 3. Settings -> Secrets and variables -> Actions -> Variables 新增：
-   - `NEXT_PUBLIC_PODCAST_DEMO_URL`：播客 Demo 域名
-   - `NEXT_PUBLIC_COMMUNITY_DEMO_URL`：社区 Demo 域名
+   - `NEXT_PUBLIC_PODCAST_DEMO_URL`：播客演示域名
+   - `NEXT_PUBLIC_COMMUNITY_DEMO_URL`：社区演示域名
 
 ### 1.2 工作流
 
@@ -23,7 +23,7 @@
 - 构建产物：`apps/portfolio-site/out`
 - 访问地址：`https://<owner>.github.io/<repo>/`
 
-## 2. Vercel（两个 Demo）
+## 2. Vercel（两个演示）
 
 为 `podcast-highlighter` 与 `community-curator` 各创建一个 Vercel Project。
 

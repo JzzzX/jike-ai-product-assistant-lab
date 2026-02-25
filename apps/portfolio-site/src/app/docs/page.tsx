@@ -10,7 +10,7 @@ const docs = [
   },
   {
     title: "技术架构",
-    desc: "Monorepo 分层、接口流转、评估链路。",
+    desc: "单仓分层、接口流转、评估链路。",
     path: "docs/architecture.md"
   },
   {

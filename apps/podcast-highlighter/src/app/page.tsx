@@ -36,6 +36,14 @@ type EvaluateRes = {
 };
 
 const MAX_AUDIO_BYTES = 15 * 1024 * 1024;
+const portfolioHomeUrl = process.env.NEXT_PUBLIC_PORTFOLIO_HOME_URL || "http://localhost:3000";
+
+function scoreLabel(score: number): string {
+  if (score >= 90) return "优秀";
+  if (score >= 80) return "稳定";
+  if (score >= 70) return "可用";
+  return "待优化";
+}
 
 export default function Page() {
   const [transcriptInput, setTranscriptInput] = useState("");
@@ -63,6 +71,7 @@ export default function Page() {
     [transcriptInput, transcriptRes]
   );
   const totalLatencyMs = (transcriptRes?.latencyMs || 0) + highlightLatencyMs + shareLatencyMs;
+  const evaluationScores = evaluation?.scores ? Object.entries(evaluation.scores) : [];
 
   async function postJson<T>(url: string, payload: unknown): Promise<T> {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -329,6 +338,9 @@ export default function Page() {
           <button className="secondary" onClick={runFullFlow} disabled={loadingAction !== ""}>
             {loadingAction ? "执行中..." : "一键跑完整流程"}
           </button>
+          <a className="back-link" href={portfolioHomeUrl} target="_blank" rel="noreferrer">
+            返回作品集首页
+          </a>
         </div>
       </section>
 
@@ -408,7 +420,11 @@ export default function Page() {
           <label htmlFor="episode-title">播客标题</label>
           <input id="episode-title" value={title} onChange={(e) => setTitle(e.target.value)} />
           <label htmlFor="share-tone">文案语气</label>
-          <input id="share-tone" value={tone} onChange={(e) => setTone(e.target.value)} />
+          <select id="share-tone" value={tone} onChange={(e) => setTone(e.target.value)}>
+            <option value="理性">理性</option>
+            <option value="专业">专业</option>
+            <option value="热情">热情</option>
+          </select>
           <button onClick={generateShareCard} disabled={loadingAction !== ""}>
             {loadingAction === "share" ? "生成中..." : "生成分享文案"}
           </button>
@@ -440,7 +456,32 @@ export default function Page() {
             {highlights.length > 0 ? "是" : "否"} / highlightCount={highlights.length}
           </p>
           <p className="meta">评估存档：{evaluation?.savedRunPath || "未生成"}</p>
-          {evaluation ? <pre>{JSON.stringify(evaluation, null, 2)}</pre> : <p className="empty-state">暂无评估结果</p>}
+          {evaluation ? (
+            <>
+              <div className="score-grid">
+                {evaluationScores.map(([key, value]) => (
+                  <article key={key} className="score-item">
+                    <h3>{key}</h3>
+                    <p>{value}</p>
+                    <span>{scoreLabel(value)}</span>
+                  </article>
+                ))}
+              </div>
+              {evaluation.notes?.length ? (
+                <ul className="note-list">
+                  {evaluation.notes.map((note) => (
+                    <li key={note}>{note}</li>
+                  ))}
+                </ul>
+              ) : null}
+              <details className="raw-json">
+                <summary>查看原始评估 JSON</summary>
+                <pre>{JSON.stringify(evaluation, null, 2)}</pre>
+              </details>
+            </>
+          ) : (
+            <p className="empty-state">暂无评估结果</p>
+          )}
         </section>
       </div>
     </main>
