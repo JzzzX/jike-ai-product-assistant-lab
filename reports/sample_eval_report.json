@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-02-20 18:12:55",
+  "generatedAt": "2026-02-25 15:16:21",
   "podcastBase": "http://127.0.0.1:3001",
   "communityBase": "http://127.0.0.1:3002",
   "podcast": {
     "sampleCount": 20,
     "avgHighlightScore": 78,
-    "avgQuality": 85,
-    "avgSpeed": 77,
-    "avgCost": 80,
+    "avgQuality": 74.2,
+    "avgSpeed": 99.95,
+    "avgCost": 90.9,
     "avgStability": 100
   },
   "community": {
     "sampleCount": 20,
-    "avgCompression": 100,
-    "avgFaithfulness": 88,
-    "avgSafety": 85,
-    "avgUsability": 94
+    "avgCompression": 92,
+    "avgFaithfulness": 89,
+    "avgSafety": 88,
+    "avgUsability": 84
   },
   "note": "Current metrics are based on fallback logic + heuristic evaluate endpoints."
 }

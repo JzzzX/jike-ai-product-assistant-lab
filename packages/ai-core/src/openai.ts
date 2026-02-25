@@ -31,8 +31,30 @@ export async function callTextModel(input: string, model?: string): Promise<stri
   return data.output_text || "";
 }
 
+function normalizeAudioFormat(input: string): string {
+  const normalized = input.trim().toLowerCase();
+  if (!normalized.includes("/")) {
+    return normalized;
+  }
+
+  const formatMap: Record<string, string> = {
+    "audio/mpeg": "mp3",
+    "audio/mp3": "mp3",
+    "audio/wav": "wav",
+    "audio/x-wav": "wav",
+    "audio/mp4": "mp4",
+    "audio/m4a": "m4a",
+    "audio/x-m4a": "m4a",
+    "audio/webm": "webm",
+    "audio/ogg": "ogg"
+  };
+
+  return formatMap[normalized] || normalized.replace(/^audio\//, "");
+}
+
 export async function transcribeAudio(base64Audio: string, mimeType: string): Promise<string> {
   const usedModel = process.env.OPENAI_MODEL_TRANSCRIBE || "gpt-4o-mini-transcribe";
+  const format = normalizeAudioFormat(mimeType);
   const response = await fetch(`${DEFAULT_BASE_URL}/responses`, {
     method: "POST",
     headers: {
@@ -49,7 +71,7 @@ export async function transcribeAudio(base64Audio: string, mimeType: string): Pr
             {
               type: "input_audio",
               audio: base64Audio,
-              format: mimeType
+              format
             }
           ]
         }

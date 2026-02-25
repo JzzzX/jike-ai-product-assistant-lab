@@ -6,6 +6,12 @@
 - `apps/community-curator`: 社区内容 AI 整理员（长帖/评论 -> 总结/聚类/草稿）
 - `apps/portfolio-site`: 作品集与实验结论展示
 
+## 当前版本
+
+- 发布状态：`Demo Release v0.9`（两条主链路均可一键跑通）
+- 验证命令：`pnpm typecheck`
+- 批量评估：启动两个 demo 后执行 `pnpm eval:samples`
+
 ## 仓库原则
 
 1. 功能不是目标，验证结论才是目标。

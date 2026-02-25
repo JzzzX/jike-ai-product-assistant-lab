@@ -3,35 +3,56 @@
 import { useMemo, useState } from "react";
 
 type Comment = { id: string; text: string };
+type SummaryMode = "short" | "long";
 
 type SummaryRes = {
   summaryShort?: string;
   summaryLong?: string;
+  summary?: string;
+  usedMode?: SummaryMode;
   keyPoints?: string[];
   source?: "fallback" | "model";
 };
 
+type ClusterEvidence = { id: string; text: string };
+type ClusterItem = { label: string; stance: string; evidenceIds: string[]; evidence?: ClusterEvidence[] };
+type ClusterDisagreement = { topic: string; sides: string[]; evidenceIds: string[] };
+
 type ClusterRes = {
-  clusters?: Array<{ label: string; stance: string; evidenceIds: string[] }>;
-  disagreements?: string[];
+  clusters?: ClusterItem[];
+  disagreements?: ClusterDisagreement[];
+  evidenceMap?: Record<string, string>;
   source?: "fallback" | "model";
 };
 
 type DraftRes = {
   drafts?: Array<{ tone: string; text: string; riskHint: string }>;
   constraintsApplied?: string[];
+  riskHint?: string;
   source?: "fallback" | "model";
 };
 
 type EvaluateRes = {
   scores?: Record<string, number>;
   notes?: string[];
+  inputUsed?: {
+    summaryLength?: number;
+    replyConfidence?: number;
+    flags?: string[];
+    hasEvidenceMap?: boolean;
+    mode?: SummaryMode;
+  };
 };
 
 export default function Page() {
   const [post, setPost] = useState("很多人在讨论播客到底该做深内容还是做碎片化传播。");
   const [commentsText, setCommentsText] = useState("我更喜欢深内容。\n碎片化更容易传播。\n关键是找到平衡。\n平台机制决定了内容形态。");
+  const [summaryMode, setSummaryMode] = useState<SummaryMode>("long");
+  const [clusterK, setClusterK] = useState(2);
+  const [targetCluster, setTargetCluster] = useState("平衡派");
   const [tone, setTone] = useState("友好");
+  const [constraintsText, setConstraintsText] = useState("避免攻击性\n引用观点证据");
+  const [replyConfidence, setReplyConfidence] = useState(0.72);
   const [runId, setRunId] = useState("community-demo-run");
   const [demoToken, setDemoToken] = useState("");
   const [loadingAction, setLoadingAction] = useState<"" | "summary" | "cluster" | "draft" | "eval">("");
@@ -48,6 +69,32 @@ export default function Page() {
       .map((text, index) => ({ id: `c-${index + 1}`, text: text.trim() }))
       .filter((item) => item.text);
   }, [commentsText]);
+
+  const selectedCluster = useMemo(() => {
+    if (!cluster?.clusters?.length) {
+      return null;
+    }
+    return cluster.clusters.find((item) => item.label === targetCluster) || cluster.clusters[0];
+  }, [cluster, targetCluster]);
+
+  const displayedSummary = useMemo(() => {
+    if (!summary) {
+      return "";
+    }
+    if (summaryMode === "short") {
+      return summary.summaryShort || summary.summary || "";
+    }
+    return summary.summaryLong || summary.summary || "";
+  }, [summary, summaryMode]);
+
+  const constraints = useMemo(
+    () =>
+      constraintsText
+        .split("\n")
+        .map((item) => item.trim())
+        .filter(Boolean),
+    [constraintsText]
+  );
 
   async function postJson<T>(url: string, payload: unknown): Promise<T> {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -72,7 +119,7 @@ export default function Page() {
     setLoadingAction("summary");
     setRequestError("");
     try {
-      const data = await postJson<SummaryRes>("/api/summarize-thread", { post, comments, mode: "long" });
+      const data = await postJson<SummaryRes>("/api/summarize-thread", { post, comments, mode: summaryMode });
       setSummary(data);
     } catch (error) {
       setRequestError(error instanceof Error ? error.message : "summary failed");
@@ -85,8 +132,12 @@ export default function Page() {
     setLoadingAction("cluster");
     setRequestError("");
     try {
-      const data = await postJson<ClusterRes>("/api/cluster-opinions", { comments });
+      const data = await postJson<ClusterRes>("/api/cluster-opinions", { comments, clusterK });
       setCluster(data);
+      const clusters = data.clusters || [];
+      if (clusters.length) {
+        setTargetCluster((prev) => (clusters.some((item) => item.label === prev) ? prev : clusters[0].label));
+      }
     } catch (error) {
       setRequestError(error instanceof Error ? error.message : "cluster failed");
     } finally {
@@ -97,11 +148,19 @@ export default function Page() {
   async function draftReply() {
     setLoadingAction("draft");
     setRequestError("");
+    if (!constraints.length) {
+      setRequestError("至少提供一条约束");
+      setLoadingAction("");
+      return;
+    }
     try {
       const data = await postJson<DraftRes>("/api/reply-draft", {
-        targetCluster: "平衡派",
+        targetCluster: selectedCluster?.label || targetCluster,
+        cluster: selectedCluster,
+        evidenceMap: cluster?.evidenceMap,
+        disagreements: cluster?.disagreements,
         tone,
-        constraints: ["避免攻击性", "引用观点证据"]
+        constraints
       });
       setDrafts(data);
     } catch (error) {
@@ -111,11 +170,83 @@ export default function Page() {
     }
   }
 
+  async function runFullFlow() {
+    setRequestError("");
+    try {
+      setLoadingAction("summary");
+      const summaryData = await postJson<SummaryRes>("/api/summarize-thread", { post, comments, mode: summaryMode });
+      setSummary(summaryData);
+
+      setLoadingAction("cluster");
+      const clusterData = await postJson<ClusterRes>("/api/cluster-opinions", { comments, clusterK });
+      setCluster(clusterData);
+      const availableClusters = clusterData.clusters || [];
+      const chosenCluster = availableClusters.find((item) => item.label === targetCluster) || availableClusters[0] || null;
+      if (chosenCluster) {
+        setTargetCluster(chosenCluster.label);
+      }
+
+      if (!constraints.length) {
+        throw new Error("至少提供一条约束");
+      }
+
+      setLoadingAction("draft");
+      const draftData = await postJson<DraftRes>("/api/reply-draft", {
+        targetCluster: chosenCluster?.label || targetCluster,
+        cluster: chosenCluster || undefined,
+        evidenceMap: clusterData.evidenceMap,
+        disagreements: clusterData.disagreements,
+        tone,
+        constraints
+      });
+      setDrafts(draftData);
+
+      const flags = [
+        summaryData.source === "fallback" ? "summary-fallback" : "",
+        clusterData.source === "fallback" ? "cluster-fallback" : "",
+        draftData.source === "fallback" ? "draft-fallback" : "",
+        !draftData.constraintsApplied?.length ? "constraints-missing" : ""
+      ].filter(Boolean);
+
+      setLoadingAction("eval");
+      const summaryText = summaryMode === "short" ? summaryData.summaryShort || "" : summaryData.summaryLong || "";
+      const evaluationData = await postJson<EvaluateRes>("/api/evaluate", {
+        runId,
+        summary: { text: summaryText, mode: summaryMode },
+        summaryLength: summaryText.length,
+        replyConfidence,
+        flags,
+        cluster: { evidenceMap: clusterData.evidenceMap },
+        draft: { constraintsApplied: draftData.constraintsApplied, riskHint: draftData.riskHint || draftData.drafts?.[0]?.riskHint }
+      });
+      setEvaluation(evaluationData);
+    } catch (error) {
+      setRequestError(error instanceof Error ? error.message : "run full flow failed");
+    } finally {
+      setLoadingAction("");
+    }
+  }
+
   async function evaluate() {
     setLoadingAction("eval");
     setRequestError("");
     try {
-      const data = await postJson<EvaluateRes>("/api/evaluate", { runId });
+      const flags = [
+        summary?.source === "fallback" ? "summary-fallback" : "",
+        cluster?.source === "fallback" ? "cluster-fallback" : "",
+        drafts?.source === "fallback" ? "draft-fallback" : "",
+        !drafts?.constraintsApplied?.length ? "constraints-missing" : ""
+      ].filter(Boolean);
+
+      const data = await postJson<EvaluateRes>("/api/evaluate", {
+        runId,
+        summary: { text: displayedSummary, mode: summaryMode },
+        summaryLength: displayedSummary.length,
+        replyConfidence,
+        flags,
+        cluster: { evidenceMap: cluster?.evidenceMap },
+        draft: { constraintsApplied: drafts?.constraintsApplied, riskHint: drafts?.riskHint || drafts?.drafts?.[0]?.riskHint }
+      });
       setEvaluation(data);
     } catch (error) {
       setRequestError(error instanceof Error ? error.message : "evaluation failed");
@@ -148,6 +279,9 @@ export default function Page() {
           />
           <p>评论数量：{comments.length}</p>
           <p>总结来源：{summary?.source || "尚未请求"}</p>
+          <button className="secondary" onClick={runFullFlow} disabled={loadingAction !== ""}>
+            {loadingAction ? "执行中..." : "一键跑完整流程"}
+          </button>
         </div>
       </section>
 
@@ -158,13 +292,19 @@ export default function Page() {
           <h2>1. 输入讨论串</h2>
           <textarea rows={4} value={post} onChange={(e) => setPost(e.target.value)} />
           <textarea rows={8} value={commentsText} onChange={(e) => setCommentsText(e.target.value)} style={{ marginTop: 10 }} />
+          <label htmlFor="summary-mode">总结模式</label>
+          <select id="summary-mode" value={summaryMode} onChange={(e) => setSummaryMode(e.target.value as SummaryMode)}>
+            <option value="short">short</option>
+            <option value="long">long</option>
+          </select>
           <button onClick={summarizeThread} disabled={loadingAction !== ""}>
             {loadingAction === "summary" ? "处理中..." : "生成总结"}
           </button>
-          {summary?.summaryLong ? (
+          {summary ? (
             <div className="result-card">
-              <h3>{summary.summaryShort}</h3>
-              <p>{summary.summaryLong}</p>
+              <h3>{summaryMode === "short" ? "短总结" : "长总结"}</h3>
+              <p>{displayedSummary || "暂无总结"}</p>
+              <p className="meta">当前请求模式: {summary.usedMode || summaryMode}</p>
               <ul>
                 {(summary.keyPoints || []).map((point) => (
                   <li key={point}>{point}</li>
@@ -179,19 +319,51 @@ export default function Page() {
 
         <section className="card reveal delay-2">
           <h2>2. 观点聚类</h2>
+          <label htmlFor="cluster-k">聚类目标数：{clusterK}</label>
+          <input
+            id="cluster-k"
+            type="range"
+            min={2}
+            max={4}
+            step={1}
+            value={clusterK}
+            onChange={(e) => setClusterK(Number(e.target.value))}
+          />
           <button className="secondary" onClick={clusterOpinions} disabled={loadingAction !== ""}>
             {loadingAction === "cluster" ? "聚类中..." : "聚类与分歧提炼"}
           </button>
           {cluster?.clusters?.length ? (
-            <ul className="cluster-list">
-              {cluster.clusters.map((item) => (
-                <li key={item.label}>
-                  <strong>{item.label}</strong>
-                  <p>{item.stance}</p>
-                  <span>证据: {item.evidenceIds.join(", ")}</span>
-                </li>
+            <>
+              <label htmlFor="target-cluster">回复目标观点簇</label>
+              <select id="target-cluster" value={targetCluster} onChange={(e) => setTargetCluster(e.target.value)}>
+                {cluster.clusters.map((item) => (
+                  <option key={item.label} value={item.label}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+
+              <ul className="cluster-list">
+                {cluster.clusters.map((item) => (
+                  <li key={item.label}>
+                    <strong>{item.label}</strong>
+                    <p>{item.stance}</p>
+                    <p>证据ID: {item.evidenceIds.join(", ") || "无"}</p>
+                    <ul>
+                      {(item.evidence || []).map((evidence) => (
+                        <li key={`${item.label}-${evidence.id}`}>{evidence.id}: {evidence.text}</li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+
+              {(cluster.disagreements || []).map((item) => (
+                <p key={item.topic} className="meta">
+                  分歧: {item.topic} | 立场: {item.sides.join(" vs ")} | 证据: {item.evidenceIds.join(", ")}
+                </p>
               ))}
-            </ul>
+            </>
           ) : (
             <pre>{JSON.stringify(cluster, null, 2)}</pre>
           )}
@@ -200,18 +372,29 @@ export default function Page() {
         <section className="card reveal delay-3">
           <h2>3. 评论草稿</h2>
           <input value={tone} onChange={(e) => setTone(e.target.value)} />
+          <textarea
+            rows={3}
+            value={constraintsText}
+            onChange={(e) => setConstraintsText(e.target.value)}
+            style={{ marginTop: 8 }}
+            placeholder="每行一条约束"
+          />
           <button onClick={draftReply} disabled={loadingAction !== ""}>
             {loadingAction === "draft" ? "生成中..." : "生成多语气草稿"}
           </button>
           {drafts?.drafts?.length ? (
-            <ul className="draft-list">
-              {drafts.drafts.map((item) => (
-                <li key={item.text}>
-                  <p className="quote">{item.text}</p>
-                  <p className="risk">风险提醒：{item.riskHint}</p>
-                </li>
-              ))}
-            </ul>
+            <>
+              <ul className="draft-list">
+                {drafts.drafts.map((item) => (
+                  <li key={item.text}>
+                    <p className="quote">{item.text}</p>
+                    <p className="risk">风险提醒：{item.riskHint}</p>
+                  </li>
+                ))}
+              </ul>
+              <p className="meta">constraintsApplied: {(drafts.constraintsApplied || []).join("、") || "无"}</p>
+              <p className="risk">总体风险提示：{drafts.riskHint || drafts.drafts[0]?.riskHint || "无"}</p>
+            </>
           ) : (
             <pre>{JSON.stringify(drafts, null, 2)}</pre>
           )}
@@ -220,6 +403,16 @@ export default function Page() {
         <section className="card reveal delay-4">
           <h2>4. 评估</h2>
           <input value={runId} onChange={(e) => setRunId(e.target.value)} />
+          <label htmlFor="reply-confidence">回复信心：{Math.round(replyConfidence * 100)}%</label>
+          <input
+            id="reply-confidence"
+            type="range"
+            min={0}
+            max={1}
+            step={0.05}
+            value={replyConfidence}
+            onChange={(e) => setReplyConfidence(Number(e.target.value))}
+          />
           <button className="secondary" onClick={evaluate} disabled={loadingAction !== ""}>
             {loadingAction === "eval" ? "评估中..." : "生成评估"}
           </button>

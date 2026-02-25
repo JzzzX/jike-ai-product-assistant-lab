@@ -20,10 +20,16 @@ export function buildShareCardPrompt(episodeTitle: string, highlights: Highlight
   ].join("\n");
 }
 
-export function buildThreadSummaryPrompt(post: string, comments: string[]): string {
+export function buildThreadSummaryPrompt(post: string, comments: string[], mode: "short" | "long" = "long"): string {
+  const modeInstruction =
+    mode === "short"
+      ? "当前输出模式为 short，请让 summaryShort 更精炼，summaryLong 仅需一句补充。"
+      : "当前输出模式为 long，请让 summaryLong 更完整，summaryShort 保持速读概览。";
+
   return [
     "你是社区内容分析助手。",
     "请生成速读总结和深读总结，并提取关键观点。",
+    modeInstruction,
     `主帖：${post}`,
     `评论：${comments.join("\n")}`,
     "返回 JSON: summaryShort, summaryLong, keyPoints"

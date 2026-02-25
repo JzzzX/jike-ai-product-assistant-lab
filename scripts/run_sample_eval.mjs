@@ -35,19 +35,28 @@ async function runPodcastEval(samples) {
       transcript: item.transcript
     });
 
+    const highlightStarted = Date.now();
     const highlights = await postJson(`${podcastBase}/api/highlights`, {
       transcript: transcribe.transcript,
+      segments: transcribe.segments || [],
       maxHighlights: 2
     });
+    const highlightLatencyMs = Date.now() - highlightStarted;
 
+    const shareStarted = Date.now();
     const shareCard = await postJson(`${podcastBase}/api/share-card`, {
       episodeTitle: item.title,
       highlights: highlights.highlights || [],
       tone: "理性"
     });
+    const shareLatencyMs = Date.now() - shareStarted;
 
     const evalRes = await postJson(`${podcastBase}/api/evaluate`, {
-      runId: `podcast-${item.id}`
+      runId: `podcast-${item.id}`,
+      latencyMs: (transcribe.latencyMs || 0) + highlightLatencyMs + shareLatencyMs,
+      errorCount: 0,
+      hasHighlights: Boolean(highlights.highlights?.length),
+      highlightCount: highlights.highlights?.length || 0
     });
 
     if (highlights.highlights?.[0]?.score != null) {
@@ -93,17 +102,32 @@ async function runCommunityEval(threads) {
     });
 
     const cluster = await postJson(`${communityBase}/api/cluster-opinions`, {
-      comments
+      comments,
+      clusterK: 3
     });
 
+    const selectedCluster = cluster.clusters?.[0];
     const draft = await postJson(`${communityBase}/api/reply-draft`, {
-      targetCluster: "平衡派",
+      targetCluster: selectedCluster?.label || "平衡派",
+      cluster: selectedCluster,
+      evidenceMap: cluster.evidenceMap,
+      disagreements: cluster.disagreements,
       tone: "友好",
       constraints: ["避免攻击性", "引用观点证据"]
     });
 
+    const summaryText = sum.summaryLong || sum.summary || "";
     const evalRes = await postJson(`${communityBase}/api/evaluate`, {
-      runId: `community-${item.id}`
+      runId: `community-${item.id}`,
+      summary: { text: summaryText, mode: "long" },
+      summaryLength: summaryText.length,
+      replyConfidence: 0.7,
+      flags: [],
+      cluster: { evidenceMap: cluster.evidenceMap },
+      draft: {
+        constraintsApplied: draft.constraintsApplied,
+        riskHint: draft.riskHint || draft.drafts?.[0]?.riskHint
+      }
     });
 
     if (!sum.summaryShort || !cluster.clusters?.length || !draft.drafts?.length) {
