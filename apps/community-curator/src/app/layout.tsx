@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
-  title: "Community AI Curator",
-  description: "Thread summarization, clustering, and reply drafting"
+  title: "社区内容整理演示",
+  description: "讨论串总结、聚类与回复草稿演示"
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

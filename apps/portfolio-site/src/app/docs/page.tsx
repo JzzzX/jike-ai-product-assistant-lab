@@ -34,13 +34,13 @@ export default function DocsPage() {
   return (
     <main className="minimal-shell docs-page">
       <header className="top">
-        <p>核心文档</p>
+        <p>文档中心</p>
         <a href={homePath}>返回首页</a>
       </header>
 
       <section className="block">
-        <h1>项目文档中心（对外）</h1>
-        <p className="subtitle">仅保留对外评审必要文档。</p>
+        <h1>项目文档中心（对外版）</h1>
+        <p className="subtitle">仅保留招聘评审需要的文档与入口。</p>
         <div className="doc-list">
           {docs.map((item) => (
             <article key={item.path}>

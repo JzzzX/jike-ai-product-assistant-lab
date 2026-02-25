@@ -78,7 +78,7 @@ export default function Page() {
 
     const data = (await res.json()) as T;
     if (!res.ok) {
-      throw new Error((data as { error?: string }).error || `request failed: ${res.status}`);
+      throw new Error((data as { error?: string }).error || `请求失败：${res.status}`);
     }
     return data;
   }
@@ -97,7 +97,7 @@ export default function Page() {
 
     const data = (await res.json()) as T;
     if (!res.ok) {
-      throw new Error((data as { error?: { message?: string } }).error?.message || `request failed: ${res.status}`);
+      throw new Error((data as { error?: { message?: string } }).error?.message || `请求失败：${res.status}`);
     }
     return data;
   }
@@ -131,7 +131,7 @@ export default function Page() {
       return;
     }
     if (!audioFile.type.startsWith("audio/")) {
-      setRequestError("仅支持 audio/* 格式文件");
+      setRequestError("仅支持音频格式文件（audio/*）");
       return;
     }
     if (audioFile.size > MAX_AUDIO_BYTES) {
@@ -171,7 +171,7 @@ export default function Page() {
         transcribeData = await postJson<TranscriptRes>("/api/transcribe", { transcript: transcriptInput });
       } else if (audioFile) {
         if (!audioFile.type.startsWith("audio/")) {
-          throw new Error("仅支持 audio/* 格式文件");
+          throw new Error("仅支持音频格式文件（audio/*）");
         }
         if (audioFile.size > MAX_AUDIO_BYTES) {
           throw new Error(`音频不能超过 ${Math.round(MAX_AUDIO_BYTES / 1024 / 1024)}MB`);
@@ -305,14 +305,14 @@ export default function Page() {
     <main className="demo-shell">
       <section className="hero reveal">
         <div>
-          <p className="eyebrow">播客 Demo</p>
+          <p className="eyebrow">播客演示</p>
           <h1>播客 AI 高光助手</h1>
-          <p className="hero-sub">验证闭环：转写 → 高光提取 → 分享草稿 → 评估。可选携带访问令牌调用真实模型。</p>
+          <p className="hero-sub">从原始音频到分享文案，四步完成内容提炼闭环。支持受控访问真实模型。</p>
           <div className="hero-tags">
             <span>结构化高光</span>
-            <span>可解释理由</span>
-            <span>source 标记</span>
-            <span>可控调用</span>
+            <span>可追溯时间戳</span>
+            <span>来源标记</span>
+            <span>受控调用</span>
           </div>
         </div>
         <div className="hero-side">
@@ -323,7 +323,7 @@ export default function Page() {
             onChange={(e) => setDemoToken(e.target.value)}
             placeholder="用于线上受控访问真实模型"
           />
-          <p>当前高光来源：{highlightSourceLabel}</p>
+          <p>高光来源：{highlightSourceLabel}</p>
           <p>累计延迟：{totalLatencyMs} ms</p>
           <p>累计错误：{errorCount}</p>
           <button className="secondary" onClick={runFullFlow} disabled={loadingAction !== ""}>
@@ -336,7 +336,7 @@ export default function Page() {
 
       <div className="grid">
         <section className="card reveal delay-1">
-          <h2>1. 转写（文本或音频）</h2>
+          <h2>1. 转写输入（文本或音频）</h2>
           <textarea
             rows={10}
             value={transcriptInput}
@@ -344,9 +344,9 @@ export default function Page() {
             placeholder="粘贴播客转写文本（可与音频上传二选一）"
           />
           <button onClick={generateFromText} disabled={loadingAction !== ""}>
-            {loadingAction === "transcribe" ? "处理中..." : "文本生成分段转写"}
+            {loadingAction === "transcribe" ? "处理中..." : "用文本生成转写结构"}
           </button>
-          <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
+          <div className="field-stack">
             <input
               type="file"
               accept="audio/*"
@@ -355,13 +355,13 @@ export default function Page() {
             <button onClick={generateFromAudio} disabled={loadingAction !== "" || !audioFile}>
               {loadingAction === "transcribe" ? "处理中..." : "上传音频并转写"}
             </button>
-            <p className="meta" style={{ margin: 0 }}>
+            <p className="meta compact">
               音频文件：{audioFile ? `${audioFile.name} (${Math.round(audioFile.size / 1024)} KB)` : "尚未选择"}
             </p>
-            <p className="meta" style={{ margin: 0 }}>
-              限制：audio/*，最大 {Math.round(MAX_AUDIO_BYTES / 1024 / 1024)}MB
+            <p className="meta compact">
+              限制：音频格式（audio/*），最大 {Math.round(MAX_AUDIO_BYTES / 1024 / 1024)}MB
             </p>
-            <p className="meta" style={{ margin: 0 }}>
+            <p className="meta compact">
               转写来源：{transcriptRes?.source || "未生成"}
             </p>
           </div>
@@ -377,7 +377,7 @@ export default function Page() {
               ))}
             </ul>
           ) : (
-            <pre>{JSON.stringify(transcriptRes, null, 2)}</pre>
+            <p className="empty-state">暂无转写结果</p>
           )}
         </section>
 
@@ -399,14 +399,16 @@ export default function Page() {
               ))}
             </ul>
           ) : (
-            <pre>{JSON.stringify(highlights, null, 2)}</pre>
+            <p className="empty-state">暂无高光内容</p>
           )}
         </section>
 
         <section className="card reveal delay-3">
           <h2>3. 分享卡片</h2>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} />
-          <input value={tone} onChange={(e) => setTone(e.target.value)} style={{ marginTop: 8 }} />
+          <label htmlFor="episode-title">播客标题</label>
+          <input id="episode-title" value={title} onChange={(e) => setTitle(e.target.value)} />
+          <label htmlFor="share-tone">文案语气</label>
+          <input id="share-tone" value={tone} onChange={(e) => setTone(e.target.value)} />
           <button onClick={generateShareCard} disabled={loadingAction !== ""}>
             {loadingAction === "share" ? "生成中..." : "生成分享文案"}
           </button>
@@ -422,13 +424,14 @@ export default function Page() {
               <p className="meta">结果来源：{shareCard.source || "未知"}</p>
             </div>
           ) : (
-            <pre>{JSON.stringify(shareCard, null, 2)}</pre>
+            <p className="empty-state">暂无分享卡片</p>
           )}
         </section>
 
         <section className="card reveal delay-4">
           <h2>4. 评估</h2>
-          <input value={runId} onChange={(e) => setRunId(e.target.value)} />
+          <label htmlFor="run-id">运行标识</label>
+          <input id="run-id" value={runId} onChange={(e) => setRunId(e.target.value)} />
           <button className="secondary" onClick={evaluate} disabled={loadingAction !== ""}>
             {loadingAction === "eval" ? "评估中..." : "生成评估"}
           </button>
@@ -437,7 +440,7 @@ export default function Page() {
             {highlights.length > 0 ? "是" : "否"} / highlightCount={highlights.length}
           </p>
           <p className="meta">评估存档：{evaluation?.savedRunPath || "未生成"}</p>
-          <pre>{JSON.stringify(evaluation, null, 2)}</pre>
+          {evaluation ? <pre>{JSON.stringify(evaluation, null, 2)}</pre> : <p className="empty-state">暂无评估结果</p>}
         </section>
       </div>
     </main>

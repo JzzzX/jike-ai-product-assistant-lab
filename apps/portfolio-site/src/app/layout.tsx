@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
-  title: "AI Product Assistant Portfolio",
-  description: "Jike-oriented AI prototyping portfolio"
+  title: "AI 产品助理实验室",
+  description: "面向招聘展示的 AI 产品原型作品集"
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

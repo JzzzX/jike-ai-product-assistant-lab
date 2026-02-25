@@ -114,7 +114,7 @@ export default function Page() {
 
     const data = (await res.json()) as T;
     if (!res.ok) {
-      throw new Error((data as { error?: string }).error || `request failed: ${res.status}`);
+      throw new Error((data as { error?: string }).error || `请求失败：${res.status}`);
     }
     return data;
   }
@@ -263,14 +263,14 @@ export default function Page() {
     <main className="demo-shell">
       <section className="hero reveal">
         <div>
-          <p className="eyebrow">社区 Demo</p>
+          <p className="eyebrow">社区演示</p>
           <h1>社区内容 AI 整理员</h1>
-          <p className="hero-sub">验证闭环：帖子输入 → 总结 → 聚类 → 评论草稿 → 评估。支持受控模型调用。</p>
+          <p className="hero-sub">把长讨论串变成可执行结论：总结、聚类、草稿、评估四步闭环。</p>
           <div className="hero-tags">
             <span>观点聚类</span>
             <span>证据映射</span>
             <span>风险提示</span>
-            <span>source 标记</span>
+            <span>来源标记</span>
           </div>
         </div>
         <div className="hero-side">
@@ -294,8 +294,10 @@ export default function Page() {
       <div className="grid">
         <section className="card reveal delay-1">
           <h2>1. 输入讨论串</h2>
-          <textarea rows={4} value={post} onChange={(e) => setPost(e.target.value)} />
-          <textarea rows={8} value={commentsText} onChange={(e) => setCommentsText(e.target.value)} style={{ marginTop: 10 }} />
+          <label htmlFor="post-input">主题正文</label>
+          <textarea id="post-input" rows={4} value={post} onChange={(e) => setPost(e.target.value)} />
+          <label htmlFor="comments-input">评论列表（每行一条）</label>
+          <textarea id="comments-input" rows={8} value={commentsText} onChange={(e) => setCommentsText(e.target.value)} />
           <label htmlFor="summary-mode">总结模式</label>
           <select id="summary-mode" value={summaryMode} onChange={(e) => setSummaryMode(e.target.value as SummaryMode)}>
             <option value="short">短总结</option>
@@ -308,7 +310,7 @@ export default function Page() {
             <div className="result-card">
               <h3>{summaryMode === "short" ? "短总结" : "长总结"}</h3>
               <p>{displayedSummary || "暂无总结"}</p>
-              <p className="meta">当前请求模式: {summary.usedMode || summaryMode}</p>
+              <p className="meta">当前请求模式：{summary.usedMode || summaryMode}</p>
               <ul>
                 {(summary.keyPoints || []).map((point) => (
                   <li key={point}>{point}</li>
@@ -317,7 +319,7 @@ export default function Page() {
               <p className="meta">结果来源：{summary.source || "未知"}</p>
             </div>
           ) : (
-            <pre>{JSON.stringify(summary, null, 2)}</pre>
+            <p className="empty-state">暂无总结结果</p>
           )}
         </section>
 
@@ -352,10 +354,12 @@ export default function Page() {
                   <li key={item.label}>
                     <strong>{item.label}</strong>
                     <p>{item.stance}</p>
-                    <p>证据ID: {item.evidenceIds.join(", ") || "无"}</p>
+                    <p>证据编号：{item.evidenceIds.join(", ") || "无"}</p>
                     <ul>
                       {(item.evidence || []).map((evidence) => (
-                        <li key={`${item.label}-${evidence.id}`}>{evidence.id}: {evidence.text}</li>
+                        <li key={`${item.label}-${evidence.id}`}>
+                          {evidence.id}：{evidence.text}
+                        </li>
                       ))}
                     </ul>
                   </li>
@@ -364,23 +368,23 @@ export default function Page() {
 
               {(cluster.disagreements || []).map((item) => (
                 <p key={item.topic} className="meta">
-                  分歧: {item.topic} | 立场: {item.sides.join(" / ")} | 证据: {item.evidenceIds.join(", ")}
+                  分歧：{item.topic} | 立场：{item.sides.join(" / ")} | 证据：{item.evidenceIds.join(", ")}
                 </p>
               ))}
             </>
           ) : (
-            <pre>{JSON.stringify(cluster, null, 2)}</pre>
+            <p className="empty-state">暂无聚类结果</p>
           )}
         </section>
 
         <section className="card reveal delay-3">
           <h2>3. 评论草稿</h2>
-          <input value={tone} onChange={(e) => setTone(e.target.value)} />
+          <label htmlFor="draft-tone">回复语气</label>
+          <input id="draft-tone" value={tone} onChange={(e) => setTone(e.target.value)} />
           <textarea
             rows={3}
             value={constraintsText}
             onChange={(e) => setConstraintsText(e.target.value)}
-            style={{ marginTop: 8 }}
             placeholder="每行一条约束"
           />
           <button onClick={draftReply} disabled={loadingAction !== ""}>
@@ -400,13 +404,14 @@ export default function Page() {
               <p className="risk">总体风险提示：{drafts.riskHint || drafts.drafts[0]?.riskHint || "无"}</p>
             </>
           ) : (
-            <pre>{JSON.stringify(drafts, null, 2)}</pre>
+            <p className="empty-state">暂无草稿结果</p>
           )}
         </section>
 
         <section className="card reveal delay-4">
           <h2>4. 评估</h2>
-          <input value={runId} onChange={(e) => setRunId(e.target.value)} />
+          <label htmlFor="run-id">运行标识</label>
+          <input id="run-id" value={runId} onChange={(e) => setRunId(e.target.value)} />
           <label htmlFor="reply-confidence">回复信心：{Math.round(replyConfidence * 100)}%</label>
           <input
             id="reply-confidence"
@@ -421,7 +426,7 @@ export default function Page() {
             {loadingAction === "eval" ? "评估中..." : "生成评估"}
           </button>
           <p className="meta">评估存档：{evaluation?.savedRunPath || "未生成"}</p>
-          <pre>{JSON.stringify(evaluation, null, 2)}</pre>
+          {evaluation ? <pre>{JSON.stringify(evaluation, null, 2)}</pre> : <p className="empty-state">暂无评估结果</p>}
         </section>
       </div>
     </main>

@@ -44,9 +44,9 @@ const communityDemoUrl = process.env.NEXT_PUBLIC_COMMUNITY_DEMO_URL || (basePath
 const docsPath = `${basePath}/docs`;
 
 const hrSteps = [
-  "打开任一 Demo，点击“一键跑完整流程”",
-  "查看流程输出与评估分数",
-  "查看 run 存档与批量评估报告"
+  "打开任一演示，点击“一键跑完整流程”",
+  "查看四步流程结果与关键分数",
+  "回到主站核对评估报告与代码入口"
 ] as const;
 
 const coreDocs = [
@@ -96,24 +96,24 @@ export default async function Page() {
   return (
     <main className="minimal-shell">
       <header className="top">
-        <p>AI 产品打样作品集</p>
+        <p>AI 产品助理实验室</p>
         <nav>
-          <a href="#projects">项目</a>
-          <a href="#metrics">指标</a>
+          <a href="#projects">项目总览</a>
+          <a href="#metrics">指标快照</a>
           <a href="#docs">文档</a>
         </nav>
       </header>
 
       <section className="hero">
-        <h1>AI 产品助理作品集（面向招聘展示）</h1>
-        <p className="subtitle">两个可运行、可评估、可回归的 Demo：播客场景与社区场景。</p>
+        <h1>AI 产品助理作品集（招聘展示版）</h1>
+        <p className="subtitle">两个可运行、可评估、可追踪版本的演示：播客场景与社区场景。</p>
 
         <div className="actions">
           <a className="btn primary" href={podcastDemoUrl} target="_blank" rel="noreferrer">
-            打开播客 Demo
+            打开播客演示
           </a>
           <a className="btn" href={communityDemoUrl} target="_blank" rel="noreferrer">
-            打开社区 Demo
+            打开社区演示
           </a>
           <a className="btn" href={docsPath}>
             查看核心文档
@@ -124,12 +124,12 @@ export default async function Page() {
           <span>版本：v1.0</span>
           <span>播客综合分：{podcastComposite ?? "--"}</span>
           <span>社区综合分：{communityComposite ?? "--"}</span>
-          <span>报告时间：{report?.generatedAt || "未生成"}</span>
+          <span>报告生成：{report?.generatedAt || "未生成"}</span>
         </div>
       </section>
 
       <section className="block" id="guide">
-        <h2>HR 快速查看（3 分钟）</h2>
+        <h2>HR 三分钟查看路径</h2>
         <ol className="simple-list">
           {hrSteps.map((step) => (
             <li key={step}>{step}</li>
@@ -142,7 +142,7 @@ export default async function Page() {
         <div className="project-grid">
           <article>
             <h3>播客 AI 高光助手</h3>
-            <p>长音频信息提炼：转写 → 高光 → 分享 → 评估</p>
+            <p>长音频信息提炼：转写、提炼高光、生成分享文案、自动评估</p>
             <ul>
               <li>支持文本与音频输入</li>
               <li>高光时间戳与分段对齐</li>
@@ -157,7 +157,7 @@ export default async function Page() {
 
           <article>
             <h3>社区内容 AI 整理员</h3>
-            <p>长讨论串提效：总结 → 聚类 → 草稿 → 评估</p>
+            <p>长讨论串提效：总结、观点聚类、回复草稿、自动评估</p>
             <ul>
               <li>支持聚类数和约束可配置</li>
               <li>输出证据映射和风险提示</li>
@@ -196,7 +196,7 @@ export default async function Page() {
             </article>
           </div>
         ) : (
-          <p className="hint">未检测到评估报告。请先运行 `pnpm eval:samples`。</p>
+          <p className="hint">未检测到评估报告，请先运行 `pnpm eval:samples`。</p>
         )}
       </section>
 
