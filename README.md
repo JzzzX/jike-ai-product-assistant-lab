@@ -8,9 +8,11 @@
 
 ## 当前版本
 
-- 发布状态：`Demo Release v0.9`（两条主链路均可一键跑通）
+- 发布状态：`Demo Release v1.0`（两条主链路可一键跑通 + 自动 smoke）
 - 验证命令：`pnpm typecheck`
-- 批量评估：启动两个 demo 后执行 `pnpm eval:samples`
+- Lint 检查：`pnpm lint`
+- 自动回归：`pnpm smoke:v1`
+- 批量评估：先启动两个 demo 后执行 `pnpm eval:samples`
 
 ## 仓库原则
 

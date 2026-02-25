@@ -1,5 +1,20 @@
 import { evaluatePodcast } from "@repo/eval-core";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
 import { NextResponse } from "next/server";
+
+function sanitizeRunId(input: string): string {
+  return input.replace(/[^a-zA-Z0-9-_]/g, "_").slice(0, 80) || "demo-run";
+}
+
+async function saveRunReport(runId: string, payload: unknown): Promise<string> {
+  const safeRunId = sanitizeRunId(runId);
+  const dir = path.resolve(process.cwd(), "evaluation", "runs");
+  await mkdir(dir, { recursive: true });
+  const targetPath = path.join(dir, `${safeRunId}.json`);
+  await writeFile(targetPath, JSON.stringify(payload, null, 2), "utf8");
+  return targetPath;
+}
 
 export async function POST(request: Request) {
   const body = (await request.json()) as {
@@ -25,9 +40,19 @@ export async function POST(request: Request) {
     errorCount
   });
 
-  return NextResponse.json({
+  const responsePayload = {
     runId,
     metrics: { latencyMs, errorCount, hasHighlights, highlightCount },
     ...report
+  };
+  const savedRunPath = await saveRunReport(runId, {
+    savedAt: new Date().toISOString(),
+    app: "podcast-highlighter",
+    ...responsePayload
+  });
+
+  return NextResponse.json({
+    ...responsePayload,
+    savedRunPath
   });
 }

@@ -24,6 +24,7 @@ type ShareCardRes = {
 
 type EvaluateRes = {
   runId?: string;
+  savedRunPath?: string;
   metrics?: {
     latencyMs: number;
     errorCount: number;
@@ -433,6 +434,7 @@ export default function Page() {
             入参指标：latencyMs={totalLatencyMs} / errorCount={errorCount} / hasHighlights=
             {highlights.length > 0 ? "true" : "false"} / highlightCount={highlights.length}
           </p>
+          <p className="meta">评估存档：{evaluation?.savedRunPath || "未生成"}</p>
           <pre>{JSON.stringify(evaluation, null, 2)}</pre>
         </section>
       </div>

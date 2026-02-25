@@ -10,7 +10,8 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "format": "prettier --write .",
-    "eval:samples": "node scripts/run_sample_eval.mjs"
+    "eval:samples": "node scripts/run_sample_eval.mjs",
+    "smoke:v1": "node scripts/run_release_smoke.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.13.5",

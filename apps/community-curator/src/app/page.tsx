@@ -33,6 +33,8 @@ type DraftRes = {
 };
 
 type EvaluateRes = {
+  runId?: string;
+  savedRunPath?: string;
   scores?: Record<string, number>;
   notes?: string[];
   inputUsed?: {
@@ -416,6 +418,7 @@ export default function Page() {
           <button className="secondary" onClick={evaluate} disabled={loadingAction !== ""}>
             {loadingAction === "eval" ? "评估中..." : "生成评估"}
           </button>
+          <p className="meta">评估存档：{evaluation?.savedRunPath || "未生成"}</p>
           <pre>{JSON.stringify(evaluation, null, 2)}</pre>
         </section>
       </div>
