@@ -20,11 +20,11 @@
 2. 查看四步流程输出与评估分数。
 3. 查看批量评估报告和版本记录。
 
-## 演示地址（部署后填写）
+## 演示地址
 
-- 作品集站点：`https://<your-pages-url>`
-- 播客演示：`https://<your-podcast-url>`
-- 社区演示：`https://<your-community-url>`
+- 作品集站点：`https://jzzzx.github.io/jike-ai-product-assistant-lab/`
+- 播客演示：`https://jike-podcast-highlighter.vercel.app`
+- 社区演示：`https://jike-community-curator.vercel.app`
 
 ## 证据材料
 

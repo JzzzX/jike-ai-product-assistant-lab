@@ -8,6 +8,12 @@
 - [播客 AI 高光助手](apps/podcast-highlighter/README.md)
 - [社区内容 AI 整理员](apps/community-curator/README.md)
 
+## 在线体验地址
+
+- 作品集站点：`https://jzzzx.github.io/jike-ai-product-assistant-lab/`
+- 播客演示：`https://jike-podcast-highlighter.vercel.app`
+- 社区演示：`https://jike-community-curator.vercel.app`
+
 ## HR 快速入口
 
 - 一页展示：[SHOWCASE.md](SHOWCASE.md)
