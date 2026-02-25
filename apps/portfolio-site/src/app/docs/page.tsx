@@ -4,46 +4,55 @@ const homePath = basePath || "/";
 
 const docs = [
   {
-    title: "阶段门禁",
-    desc: "定义每个阶段的通过标准，避免范围蔓延导致交付失焦。",
-    path: "docs/execution/stage-gates.md"
+    title: "Overview",
+    desc: "项目定位、两条产品线目标和对招聘场景的展示方式。",
+    path: "docs/overview.md"
   },
   {
-    title: "风险清单",
-    desc: "沉淀模型可用性、内容安全、进度风险与对应缓解措施。",
-    path: "docs/execution/risk-register.md"
+    title: "Architecture",
+    desc: "Monorepo 结构、接口流转、fallback 与评估链路。",
+    path: "docs/architecture.md"
   },
   {
-    title: "面试题库",
-    desc: "把项目结果转成可复述、可追问的数据化表达素材。",
-    path: "docs/execution/interview-bank.md"
+    title: "Evaluation",
+    desc: "指标口径、验证命令、样本结果与 run 落盘策略。",
+    path: "docs/evaluation.md"
+  },
+  {
+    title: "Releases",
+    desc: "v0.9 到 v1.0 的发布增量与质量门禁。",
+    path: "docs/releases.md"
+  },
+  {
+    title: "Showcase",
+    desc: "给 HR 的一页式项目介绍。",
+    path: "SHOWCASE.md"
   }
 ] as const;
 
 export default function DocsPage() {
   return (
     <main className="docs-shell">
-      <section className="docs-hero reveal">
-        <p className="docs-kicker">Execution Archive</p>
-        <h1>项目执行文档中心</h1>
-        <p>这组文档用于支撑“需求拆解 → 实验评估 → 决策复盘”的全过程追踪。</p>
-        <a className="btn ghost" href={homePath}>
-          返回作品集首页
+      <header className="docs-header reveal">
+        <p>Core Docs</p>
+        <h1>External Review Document Center</h1>
+        <a className="back-link" href={homePath}>
+          Back to Portfolio
         </a>
-      </section>
+      </header>
 
       <section className="docs-grid reveal delay-1">
         {docs.map((item) => (
-          <article className="doc-card" key={item.title}>
+          <article key={item.path} className="doc-panel">
             <h2>{item.title}</h2>
             <p>{item.desc}</p>
             <code>{item.path}</code>
             {repoUrl ? (
-              <a className="inline-link" href={`${repoUrl}/blob/main/${item.path}`} target="_blank" rel="noreferrer">
-                在 GitHub 查看
+              <a href={`${repoUrl}/blob/main/${item.path}`} target="_blank" rel="noreferrer">
+                Open in GitHub
               </a>
             ) : (
-              <span className="inline-muted">配置 NEXT_PUBLIC_GITHUB_REPO_URL 后可直达 GitHub 文件</span>
+              <span className="muted">Set NEXT_PUBLIC_GITHUB_REPO_URL to enable link</span>
             )}
           </article>
         ))}

@@ -1,41 +1,52 @@
-# 即刻 AI 产品助理项目实验室
+# AI Product Prototyping Portfolio
 
-这是一个按“技术验证与打样”构建的双项目作品集仓库：
+这是一个面向招聘场景的 AI 产品打样作品集：
 
-- `apps/podcast-highlighter`: 播客 AI 高光助手（音视频 -> 高光 -> 分享）
-- `apps/community-curator`: 社区内容 AI 整理员（长帖/评论 -> 总结/聚类/草稿）
-- `apps/portfolio-site`: 作品集与实验结论展示
+- [播客 AI 高光助手](apps/podcast-highlighter/README.md)
+- [社区内容 AI 整理员](apps/community-curator/README.md)
+- [作品集站点](apps/portfolio-site/README.md)
+
+## 给 HR 的快速入口
+
+- 1 页总览: [SHOWCASE.md](SHOWCASE.md)
+- 项目概览: [docs/overview.md](docs/overview.md)
+- 技术架构: [docs/architecture.md](docs/architecture.md)
+- 评估方法与结果: [docs/evaluation.md](docs/evaluation.md)
+- 发布记录: [docs/releases.md](docs/releases.md)
 
 ## 当前版本
 
-- 发布状态：`Demo Release v1.0`（两条主链路可一键跑通 + 自动 smoke）
-- 验证命令：`pnpm typecheck`
-- Lint 检查：`pnpm lint`
-- 自动回归：`pnpm smoke:v1`
-- 批量评估：先启动两个 demo 后执行 `pnpm eval:samples`
+`Demo Release v1.0`
 
-## 仓库原则
+- 双 Demo 支持一键完整流程
+- 支持样本批量评估
+- 支持自动 smoke 回归
+- 评估 run 支持落盘追踪
 
-1. 功能不是目标，验证结论才是目标。
-2. 每个功能必须能被评估（质量、速度、成本、稳定性）。
-3. 每个项目必须包含 PRD-Lite、实验日志、决策日志。
-
-## 快速开始（依赖安装后）
+## 本地运行
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-## 核心文档
+## 质量与验证命令
 
-- 计划总览: `ai_product_assistant_plan.md`
-- 最新交接: `docs/execution/SESSION_HANDOFF_2026-02-24.md`
-- 阶段门禁: `docs/execution/stage-gates.md`
-- 风险清单: `docs/execution/risk-register.md`
-- 面试题库: `docs/execution/interview-bank.md`
-- 部署指南: `docs/deployment/github-pages-vercel.md`
+```bash
+pnpm lint
+pnpm typecheck
+pnpm smoke:v1
+pnpm eval:samples
+```
 
-## 历史归档
+说明：`eval:samples` 需要先启动两个 demo 服务（3001/3002）。
 
-- 旧阶段推进记录与临时计划: `docs/archive/2026-02-20-planning/`
+## 仓库结构（精简视图）
+
+- `apps/podcast-highlighter`: 音频场景 demo
+- `apps/community-curator`: 社区场景 demo
+- `apps/portfolio-site`: 对外展示页面
+- `packages/ai-core`: 模型调用与提示词
+- `packages/eval-core`: 评估函数
+- `docs/`: 对外文档
+- `docs/internal/`: 内部材料（不作为对外展示）
